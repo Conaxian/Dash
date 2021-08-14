@@ -21,8 +21,7 @@ class App:
         self.win.bind("<F11>", self.toggle_fullscreen)
         self.document = None
 
-    def toggle_fullscreen(self, event):
-        print(event.__class__)
+    def toggle_fullscreen(self, event: tk.Event):
         self.fullscreen = not self.fullscreen
         self.win.attributes("-fullscreen", self.fullscreen)
 
