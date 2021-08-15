@@ -96,7 +96,18 @@ class Tokenizer:
             self.state = "RCDATA_LESSTHAN"
         elif self.char == NULL:
             # Parse Error
+            return Character(REPLACEMENT_CHAR)
+        elif self.char == EOF:
+            return Eof()
+        else:
             return Character(self.char)
+
+    def rawtext_state(self):
+        if self.char == "<":
+            self.state = "RAWTEXT_LESSTHAN"
+        elif self.char == NULL:
+            # Parse Error
+            return Character(REPLACEMENT_CHAR)
         elif self.char == EOF:
             return Eof()
         else:
@@ -196,6 +207,47 @@ class Tokenizer:
             for char in self.temp_string:
                 chars.append(Character(char))
             self.state = "RCDATA"
+            self.pos -= 1
+            return (*chars,)
+
+    def rawtext_lessthan_state(self):
+        if self.char == "/":
+            self.temp_string = ""
+            self.state = "RAWTEXT_END_TAG_OPEN"
+        else:
+            self.state = "RAWTEXT"
+            self.pos -= 1
+            return Character("<")
+
+    def rawtext_end_tag_open_state(self):
+        if self.char in ASCII_LETTERS:
+            self.temp = EndTag()
+            self.state = "RAWTEXT_END_TAG_NAME"
+            self.pos -= 1
+        else:
+            self.state = "RAWTEXT"
+            self.pos -= 1
+            return (Character("<"), Character("/"))
+
+    def rawtext_end_tag_name_state(self):
+        if self.char in SPACE and self.correct_end_tag():
+            self.state = "PRE_ATTR_NAME"
+        elif self.char == "/" and self.correct_end_tag():
+            self.state = "SELFCLOSING_TAG"
+        elif self.char == ">" and self.correct_end_tag():
+            self.state = "DATA"
+            return self.temp_clear()
+        elif self.char in ASCII_LETTERS_UPPER:
+            self.temp.name += self.char.lower()
+            self.temp_string += self.char
+        elif self.char in ASCII_LETTERS_LOWER:
+            self.temp.name += self.char
+            self.temp_string += self.char
+        else:
+            chars = [Character("<"), Character("/")]
+            for char in self.temp_string:
+                chars.append(Character(char))
+            self.state = "RAWTEXT"
             self.pos -= 1
             return (*chars,)
 
