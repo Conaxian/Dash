@@ -1,7 +1,9 @@
 import http.client as http
 from re import compile as regex
 
-headers_regex = regex(r"^[ \t]*(?P<name>[a-zA-Z-]+):[ \t]*(?P<value>.+)$")
+DEFAULT_CHARSET = "utf-8"
+
+headers_regex = regex(r"^[ \t]*(?P<name>[a-zA-Z0-9-]+):[ \t]*(?P<value>.+)$")
 charset_regex = regex(r"charset=([a-zA-Z0-9-_]+)")
 
 class Response:
@@ -46,7 +48,8 @@ class Response:
         """
         Decodes and returns the response body.
         """
-        return self.body.decode(self.charset(), "ignore")
+        return self.body.decode(self.charset() or \
+        DEFAULT_CHARSET, "ignore")
 
     @staticmethod
     def parse_headers(headers: str="") -> dict[str, str]:

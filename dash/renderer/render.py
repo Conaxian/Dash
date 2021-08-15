@@ -1,16 +1,16 @@
 import tkinter as tk
-from document import Document
+from html_parser import Document
 
 DEFAULT_FONT = "Times New Roman"
 DEFAULT_SIZE = 16
 
 DEFAULTS = {
     "h1": {
-        "font": "Arial",
+        "font": "Times New Roman",
         "size": 20
     },
     "p": {
-        "font": "Arial",
+        "font": "Times New Roman",
         "size": 16,
         "justify": tk.LEFT
     }
@@ -33,7 +33,7 @@ class Text(Component):
         text: str,
         font: str=DEFAULT_FONT,
         size: int=DEFAULT_SIZE,
-        justify: str=""
+        justify: str=tk.LEFT
     ) -> None:
         self.text = text
         self.font = font
@@ -46,13 +46,14 @@ class Text(Component):
         """
         text = tk.Label(win,
             text=self.text,
-            font=(self.font, self.size)
+            font=(self.font, self.size),
+            justify=self.justify
         )
         text.pack()
 
 class Renderer:
     """
-    Renders a HTML document.
+    Renders an HTML document.
     """
     def __init__(self) -> None:
         pass

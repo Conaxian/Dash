@@ -1,5 +1,6 @@
 from requestor import Url, HttpClient, HttpsClient
-from document import Document
+from html_parser import Parser as HtmlParser
+from html_parser import Document
 
 USER_AGENT = \
 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
@@ -15,7 +16,7 @@ class UnsupportedContentTypeError(Exception):
 
 class HttpError(Exception):
     """
-    Represents a HTTP error with a response code.
+    Represents an HTTP error with a response code.
     """
     def __init__(self, code: int, name: str) -> None:
         super().__init__(f"{code} {name}")
@@ -39,7 +40,9 @@ def load(url: str) -> Document:
 
     if resp.code == 200:
         if resp.type() == "text/html":
-            document = Document(resp.decoded())
+            html = resp.decoded()
+            parser = HtmlParser(html)
+            document = parser.parse()
         else:
             raise UnsupportedContentTypeError(
                 f"Content type '{resp.type()}' not supported"

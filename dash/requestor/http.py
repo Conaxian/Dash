@@ -6,7 +6,7 @@ TIMEOUT = 5
 
 class Connection:
     """
-    Represents a HTTP connection.
+    Represents an HTTP connection.
     """
     def __init__(self, conn: http.HTTPConnection, url: Url) -> None:
         self._conn = conn

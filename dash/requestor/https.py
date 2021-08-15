@@ -7,7 +7,7 @@ TIMEOUT = 5
 
 class Connection(HttpConnection):
     """
-    Represents a HTTPS connection.
+    Represents an HTTPS connection.
     """
     def __init__(self, conn: http.HTTPSConnection, url: Url) -> None:
         super().__init__(conn, url)
