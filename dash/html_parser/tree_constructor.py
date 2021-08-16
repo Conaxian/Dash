@@ -2,6 +2,8 @@ from html_parser.constants import *
 from html_parser.tokens import Token
 from html_parser.node import Node, Root, Text
 
+# https://www.w3.org/TR/html53/syntax.html#tree-construction
+
 class TreeConstructor:
     """
     Represents a single stream of tokens from which
@@ -48,17 +50,6 @@ class TreeConstructor:
         self.token.new_state = algorithm
         self.return_mode = self.mode
         self.mode = "TEXT"
-
-    def html_in_body(self) -> None:
-        """
-        Handles the `<html>` tag in a `<body>` tag.
-        """
-        for node in self.open_nodes:
-            if node.name == "template":
-                return
-        html_node = self.open_nodes[0]
-        for key, value in self.token.attrs.values():
-            html_node.attrs.setdefault(key, value)
 
     def handle(self, token: Token) -> Node:
         """
@@ -153,7 +144,7 @@ class TreeConstructor:
             pass
         elif self.token.is_start_tag().name == "html":
             # Parse Error
-            self.html_in_body()
+            self.in_body_mode()
         elif self.token.is_start_tag().name == "head":
             node = Node("head", self.token.attrs)
             self.insert_node(node)
@@ -180,7 +171,7 @@ class TreeConstructor:
             pass
         elif self.token.is_start_tag().name == "html":
             # Parse Error
-            self.html_in_body()
+            self.in_body_mode()
         elif self.token.is_start_tag().name in \
         ("base", "basefont", "bgsound", "link", "meta"):
             node = Node(self.token.name, self.token.attrs)
@@ -212,7 +203,7 @@ class TreeConstructor:
             pass
         elif self.token.is_start_tag().name == "html":
             # Parse Error
-            self.html_in_body()
+            self.in_body_mode()
         elif self.token.is_start_tag().name == "body":
             node = Node("body", self.token.attrs)
             self.insert_node(node)
@@ -243,7 +234,60 @@ class TreeConstructor:
             self.reprocess = True
 
     def in_body_mode(self):
-        pass
+        if self.token.is_char().data == NULL:
+            # Parse Error
+            pass
+        elif self.token.is_char().data in SPACE_CR:
+            self.insert_char(self.token.data)
+        elif self.token.is_char():
+            self.insert_char(self.token.data)
+            self.frameset_ok = False
+        elif self.token.is_comment():
+            pass
+        elif self.token.is_doctype():
+            # Parse Error
+            pass
+        elif self.token.is_start_tag().name == "html":
+            # Parse Error
+            for node in self.open_nodes:
+                if node.name == "template":
+                    return
+            html_node = self.open_nodes[0]
+            for key, value in self.token.attrs.values():
+                html_node.attrs.setdefault(key, value)
+        elif self.token.is_start_tag().name in \
+        ("base", "basefont", "bgsound", "link", "meta", "noframes",
+        "script", "style", "template", "title") or \
+        self.token.is_end_tag().name == "template":
+            self.in_head_mode()
+        elif self.token.is_start_tag().name in \
+        ("address", "article", "aside", "blockquote", "center",
+        "details", "dialog", "dir", "div", "dl", "fieldset",
+        "figcaption", "figure", "footer", "header", "main", "nav",
+        "ol", "p", "section", "summary", "ul"):
+            node = Node(self.token.name, self.token.attrs)
+            self.insert_node(node)
+        elif self.token.is_start_tag().name in \
+        ("h1", "h2", "h3", "h4", "h5", "h6"):
+            node = Node(self.token.name, self.token.attrs)
+            self.insert_node(node)
+        elif self.token.is_end_tag().name == "p":
+            for node in reversed(self.open_nodes):
+                if node.name == "p":
+                    while self.open_nodes[-1].name != "p":
+                        self.open_nodes.pop()
+                    self.open_nodes.pop()
+                    return
+            # Parse Error
+        elif self.token.is_end_tag().name in \
+        ("h1", "h2", "h3", "h4", "h5", "h6"):
+            for node in reversed(self.open_nodes):
+                if node.name == self.token.name:
+                    while self.open_nodes[-1].name != self.token.name:
+                        self.open_nodes.pop()
+                    self.open_nodes.pop()
+                    return
+            # Parse Error
 
     def text_mode(self):
         if self.token.is_char().data != "<null>":
