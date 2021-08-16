@@ -701,4 +701,45 @@ class Tokenizer:
             if tokens: return tokens
 
     def ambiguous_amp_state(self):
-        pass
+        if self.char in ASCII_ALPHANUM:
+            self.temp_string += self.char
+            tokens = self.flush_code_points()
+            if tokens: return tokens
+        elif self.char == ";":
+            # Parse Error
+            self.state = self.return_state
+            self.pos -= 1
+        else:
+            self.state = self.return_state
+            self.pos -= 1
+
+    def num_char_ref_state(self):
+        self.char_code = "0"
+        if self.char in "xX":
+            self.temp_string += self.char
+            self.state = "HEX_CHAR_REF_START"
+        else:
+            self.state = "DEC_CHAR_REF_START"
+            self.pos -= 1
+
+    def hex_char_ref_start_state(self):
+        if self.char in ASCII_HEX:
+            self.state = "HEX_CHAR_REF"
+            self.pos -= 1
+        else:
+            # Parse Error
+            tokens = self.flush_code_points()
+            self.state = self.return_state
+            self.pos -= 1
+            if tokens: return tokens
+
+    def dec_char_ref_start_state(self):
+        if self.char in ASCII_DIGITS:
+            self.state = "DEC_CHAR_REF"
+            self.pos -= 1
+        else:
+            # Parse Error
+            tokens = self.flush_code_points()
+            self.state = self.return_state
+            self.pos -= 1
+            if tokens: return tokens
