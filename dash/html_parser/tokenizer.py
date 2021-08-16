@@ -53,6 +53,30 @@ class Tokenizer:
         """
         return self.temp.name == self.last_start_tag.name
 
+    def flush_code_points(self) -> Union[tuple[Character], None]:
+        """
+        Appends all code points in the temporary string to the attribute
+        value or returns character tokens, depending on the return state.
+        """
+        if "ATTR_VALUE" in self.return_state:
+            for char in self.temp_string:
+                self.temp.temp_attr[1] += self.char
+        else:
+            chars = []
+            for char in self.temp_string:
+                chars.append(Character(char))
+            return (*chars,)
+
+    def possible_char_ref(self) -> bool:
+        """
+        Returns a boolean indicating whether the current temp string
+        is a possible character reference.
+        """
+        for char_ref in CHAR_REFS:
+            if char_ref.startswith(self.temp_string):
+                return True
+        return False
+
     def tokenize(self) -> Iterator[Token]:
         """
         Tokenizes the HTML and returns a list of tokens.
@@ -634,3 +658,47 @@ class Tokenizer:
             self.temp.data += REPLACEMENT_CHAR
         else:
             self.temp.data += self.char
+
+    def char_ref_state(self):
+        self.temp_string = "&"
+        if self.char in ASCII_ALPHANUM:
+            self.state = "NAMED_CHAR_REF"
+            self.pos -= 1
+        elif self.char == "#":
+            self.temp_string += "#"
+            self.state = "NUM_CHAR_REF"
+        else:
+            tokens = self.flush_code_points()
+            self.state = self.return_state
+            self.pos -= 1
+            if tokens: return tokens
+
+    def named_char_ref_state(self):
+        self.temp_string += self.char
+        if self.char in ASCII_ALPHANUM + ";" and self.possible_char_ref():
+            if self.temp_string in CHAR_REFS:
+                if "ATTR_VALUE" in self.state and \
+                self.char != ";" and self.lookahead(2)[1] in \
+                ASCII_ALPHANUM + "=":
+                    tokens = self.flush_code_points()
+                    self.state = self.return_state
+                    if tokens: return tokens
+                else:
+                    if self.char != ";":
+                        # Parse Error
+                        pass
+                    char_ref = CHAR_REFS[self.temp_string]
+                    self.temp_string = ""
+                    for char in char_ref:
+                        self.temp_string += char
+                    tokens = self.flush_code_points()
+                    self.state = self.return_state
+                    if tokens: return tokens
+        else:
+            tokens = self.flush_code_points()
+            self.state = "AMBIGUOUS_AMP"
+            self.pos -= 1
+            if tokens: return tokens
+
+    def ambiguous_amp_state(self):
+        pass

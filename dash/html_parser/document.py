@@ -7,4 +7,8 @@ class Document:
     def __init__(self, root: Node) -> None:
         self.root = root
         self.html = root
-        self.title = root.head.title
+        title = ""
+        for child in root.head.title.walk():
+            if child.is_text():
+                title += child.data
+        self.title = title
