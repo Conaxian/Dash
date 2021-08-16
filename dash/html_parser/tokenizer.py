@@ -2,7 +2,7 @@ from typing import Iterator
 from html_parser.constants import *
 from html_parser.tokens import *
 
-# https://www.w3.org/TR/html53/syntax.html#tokenization
+# https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
 class Tokenizer:
     """

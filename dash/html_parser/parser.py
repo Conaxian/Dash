@@ -2,6 +2,8 @@ from html_parser.tokenizer import Tokenizer
 from html_parser.tree_constructor import TreeConstructor
 from html_parser.document import Document
 
+# https://html.spec.whatwg.org/multipage/parsing.html#parsing
+
 class Parser:
     """
     Represents a single parsable HTML text.

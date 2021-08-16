@@ -59,7 +59,8 @@ PUB_ID_STARTS = (
     "-//O'Reilly and Associates//DTD HTML Extended 1.0//",
     "-//O'Reilly and Associates//DTD HTML Extended Relaxed 1.0//",
     "-//SQ//DTD HTML 2.0 HoTMetaL + extensions//",
-    "-//SoftQuad Software//DTD HoTMetaL PRO 6.0::19990601::extensions to HTML 4.0//",
+    "-//SoftQuad Software//DTD HoTMetaL PRO 6.0::19990601::\
+extensions to HTML 4.0//",
     "-//SoftQuad//DTD HoTMetaL PRO 4.0::19971010::extensions to HTML 4.0//",
     "-//Spyglass//DTD HTML 2.0 Extended//",
     "-//Sun Microsystems Corp.//DTD HotJava HTML//",

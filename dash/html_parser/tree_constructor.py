@@ -2,7 +2,7 @@ from html_parser.constants import *
 from html_parser.tokens import Token
 from html_parser.node import Node, Root, Text
 
-# https://www.w3.org/TR/html53/syntax.html#tree-construction
+# https://html.spec.whatwg.org/multipage/parsing.html#tree-construction
 
 class TreeConstructor:
     """
