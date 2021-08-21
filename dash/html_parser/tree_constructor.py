@@ -1,6 +1,6 @@
 from html_parser.constants import *
 from html_parser.tokens import Token
-from html_parser.node import Node, Root, Text
+from dom.node import Node, Root, Text
 
 # https://html.spec.whatwg.org/multipage/parsing.html#tree-construction
 
