@@ -56,7 +56,6 @@ class TreeConstructor:
         Handles an incoming token from a token stream.
         """
         self.token = token
-        print(f"Token: {token}")
         while self.reprocess:
             self.reprocess = False
             mode_func = self.mode.lower() + "_mode"

@@ -1,3 +1,3 @@
-from window import Window
-from document import Document
-from node import Node, Root, Text
+from dom.window import Window
+from dom.document import Document
+from dom.node import Node, Root, Text

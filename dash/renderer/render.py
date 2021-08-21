@@ -1,5 +1,5 @@
 import tkinter as tk
-from html_parser import Document
+from dom import Document
 
 DEFAULT_FONT = "Times New Roman"
 DEFAULT_SIZE = 16

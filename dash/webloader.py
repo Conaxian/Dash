@@ -1,6 +1,6 @@
 from requestor import Url, HttpClient, HttpsClient
 from html_parser import Parser as HtmlParser
-from html_parser import Document
+from dom import Document
 
 USER_AGENT = \
 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) \

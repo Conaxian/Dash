@@ -21,5 +21,4 @@ class Parser:
         for token in tokenizer.tokenize():
             tree_constructor.handle(token)
         root = tree_constructor.root.unpack()
-        print(root)
         return Document(root)
